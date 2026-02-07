@@ -43,11 +43,9 @@ pod is wrapping around container (pea pod example)
 
 
 `kubectl api-resources`
-
 shows all resources
 
 `kubectl get crd`
-
 custom resources installed
 
 `kubectl get crd | grep -i traefik > /tmp/custom-resources.txt`
@@ -55,8 +53,7 @@ custom resources installed
 `kubectl explain secrets`
 
 `kubectl explain pods`
-
-similar to man pages
+simalar to man pages
 
 `kubectl run webapp --image=docker.io/lovelearnlinux/webserver:v1`
 
@@ -67,11 +64,9 @@ similar to man pages
 `kubectl delete pod <podname>`
 
 `kubectl get events`
-
 event you did in past - only stored past hour by default
 
 `kubectl logs <podname>`
-
 container logs
 
 `kubectl describe <podname>`
@@ -113,7 +108,6 @@ spec:
 what to put in yaml file
 
 `kubectl get pod webapp -o yaml`
-
 shows how its written in yaml (10 lines turns ot more in /etcd)
 
 ********
@@ -124,11 +118,9 @@ steps to creating and updating a pod:
 `kubectl create -f newpod.yaml`
 
 update yaml file with updates (ex: labels)
-
 `kubectl apply -f newpod.yaml`
 
 deleting pod
-
 `kubectl delete -f newpod.yaml`
 *********
 
