@@ -3,19 +3,21 @@
 ## DAY 1: 1/27 - Exploring Cluster. Accessing in a production. Containers vs Pods
 
 Autocompletion:
-`source <(kubectl completion bash)`
 
-`echo "source <(kubectl completion bash)" >> ~/.bashrc`
+```source <(kubectl completion bash)```
 
-6443 is port for k8s
+```echo "source <(kubectl completion bash)" >> ~/.bashrc```
 
-`crictl images` = calico (container)
+`6443` is port for k8s
 
-`kubectl get nodes -o wide`
-`kubectl describe node node1`
+```crictl images``` = calico (container)
+
+```kubectl get nodes -o wide```
+
+```kubectl describe node node1```
 
 labels:
-`sort resources and take action`
+sort resources and take action
 
 annotations:
 for humans
