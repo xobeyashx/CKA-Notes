@@ -4,19 +4,17 @@
 
 Autocompletion:
 
-```
-source <(kubectl completion bash)
-```
+`source <(kubectl completion bash)`
 
-```echo "source <(kubectl completion bash)" >> ~/.bashrc```
+`echo "source <(kubectl completion bash)" >> ~/.bashrc`
 
 `6443` is port for k8s
 
-```crictl images``` = calico (container)
+`crictl images` = calico (container)
 
-```kubectl get nodes -o wide```
+`kubectl get nodes -o wide`
 
-```kubectl describe node node1```
+`kubectl describe node node1`
 
 labels:
 sort resources and take action
@@ -44,44 +42,54 @@ pod is wrapping around container (pea pod example)
 ## DAY 2: 1/28 - Understanding kubernetes resources. Creating Pods imperative. Logs.
 
 
--kubectl api-resources
+`kubectl api-resources`
+
 shows all resources
 
--kubectl get crd
+`kubectl get crd`
+
 custom resources installed
 
--kubectl get crd | grep -i traefik > /tmp/custom-resources.txt
+`kubectl get crd | grep -i traefik > /tmp/custom-resources.txt`
 
--kubectl explain secrets
--kubectl explain pods
+`kubectl explain secrets`
+
+`kubectl explain pods`
 
 similar to man pages
 
--kubectl run webapp --image=docker.io/lovelearnlinux/webserver:v1
--kubectl get pods -o wide
--kubectl describe pod webapp
+`kubectl run webapp --image=docker.io/lovelearnlinux/webserver:v1`
 
--kubectl delete pod <podname>
+`kubectl get pods -o wide`
 
--kubectl get events
+`kubectl describe pod webapp`
+
+`kubectl delete pod <podname>`
+
+`kubectl get events`
+
 event you did in past - only stored past hour by default
 
--kubectl logs <podname>
+`kubectl logs <podname>`
+
 container logs
 
--kubectl describe <podname>
+`kubectl describe <podname>`
 
-CrashLoopBackOff -kubectl logs <podname>
+CrashLoopBackOff `kubectl logs <podname>`
+
 MYSQL\_ROOT\_PASSWORD error
 
-kubectl delete pod database
-kubectl run database --env=MYSQL\_ROOT\_PASSWORD=redhat --image=docker.io/mysql:latest
-kubectl get pods -o wide
+`kubectl delete pod database`
+
+`kubectl run database --env=MYSQL\_ROOT\_PASSWORD=redhat --image=docker.io/mysql:latest`
+
+`kubectl get pods -o wide`
 
 
 ## DAY 3: 1/29 -  Kubectl create vs kubectl apply. Labels and Selectors
 
--vi mypod.yaml
+`vi mypod.yaml`
 
 ```
 apiVersion: v1
@@ -96,30 +104,37 @@ spec:
     - containerPort: 80
 ```
 
--kubectl create -f mypod.yaml  (only creates, does not update)
+`kubectl create -f mypod.yaml` (only creates, does not update)
 
--kubectl describe pod webapp2
+`kubectl describe pod webapp2`
 
--kubectl explain pod
+`kubectl explain pod`
+
 what to put in yaml file
 
--kubectl get pod webapp -o yaml
+`kubectl get pod webapp -o yaml`
+
 shows how its written in yaml (10 lines turns ot more in /etcd)
 
 ********
 steps to creating and updating a pod:
--vi newpod.yaml
--kubectl create -f newpod.yaml
+
+`vi newpod.yaml`
+
+`kubectl create -f newpod.yaml`
 
 update yaml file with updates (ex: labels)
--kubectl apply -f newpod.yaml
+
+`kubectl apply -f newpod.yaml`
 
 deleting pod
--kubectl delete -f newpod.yaml
+
+`kubectl delete -f newpod.yaml`
 *********
 
 can also create multiple resources using a single yaml file -- these are two pods but we can also create 2 containers in a single pod as well by adding another container name (like the second pod)
 
+```
 apiVersion: v1
 kind: Pod
 metadata:
@@ -147,9 +162,10 @@ spec:
     - containerPort: 80
   - name: boxtwo
     image: redis 	
+```
 
--kubectl apply -f mypod.yaml
-when u delete using (kubectl delete -f yamlfile.yaml) it'll delete both 
+`kubectl apply -f mypod.yaml`
+when u delete using (`kubectl delete -f yamlfile.yaml`) it'll delete both 
 
 
 ## DAY 4: 2/2 - Quality of Service
@@ -160,6 +176,7 @@ Quality of Service Classes: burst, guarantee
 
 burst:
 
+```
 apiVersion: v1
 kind: Pod
 metadata:
@@ -184,11 +201,11 @@ spec:
       requests:
         cpu: 100m
         memory: 128Mi
-
+```
 
 
 guarantee:
-
+```
 apiVersion: v1
 kind: Pod
 metadata:
@@ -213,13 +230,14 @@ spec:
       requests:
         cpu: 300m
         memory: 256Mi
-
+```
 
 metric consumption - need to install (not native to k8s)
 using top command
 
--kubectl top nodes
--kubectl top pods
+`kubectl top nodes`
+
+`kubectl top pods`
 
 
 kubelet monitors the limits (cpu and memory)
