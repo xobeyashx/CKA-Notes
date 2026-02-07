@@ -4,6 +4,7 @@
 
 Autocompletion:
 `source <(kubectl completion bash)`
+
 `echo "source <(kubectl completion bash)" >> ~/.bashrc`
 
 6443 is port for k8s
