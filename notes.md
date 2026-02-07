@@ -1,6 +1,6 @@
-## CKA Notes:
+# CKA Notes:
 
-### DAY 1: 1/27 - Exploring Cluster. Accessing in a production. Containers vs Pods
+## DAY 1: 1/27 - Exploring Cluster. Accessing in a production. Containers vs Pods
 
 Autocompletion:
 -source <(kubectl completion bash)
@@ -36,7 +36,7 @@ pod is wrapping around container (pea pod example)
 1 pod can have multiple containers but both containers will share same resources (ip/volume)
 
 
-### DAY 2: 1/28 - Understanding kubernetes resources. Creating Pods imperative. Logs.
+## DAY 2: 1/28 - Understanding kubernetes resources. Creating Pods imperative. Logs.
 
 
 -kubectl api-resources
@@ -74,7 +74,7 @@ kubectl run database --env=MYSQL\_ROOT\_PASSWORD=redhat --image=docker.io/mysql:
 kubectl get pods -o wide
 
 
-### DAY 3: 1/29 -  Kubectl create vs kubectl apply. Labels and Selectors
+## DAY 3: 1/29 -  Kubectl create vs kubectl apply. Labels and Selectors
 
 -vi mypod.yaml
 
@@ -147,7 +147,7 @@ spec:
 when u delete using (kubectl delete -f yamlfile.yaml) it'll delete both 
 
 
-### DAY 4: 2/2 - Quality of Service
+## DAY 4: 2/2 - Quality of Service
 
 cpu and memory
 
@@ -233,7 +233,7 @@ bustable- varying load patterns (webservers, api-services, etc...)
 guarantee- apps that require high level resources (mission critical apps, video streaming, online gaming, trading, etc...)
 
 
-### DAY 5: 2/3 - Deployment PART ONE
+## DAY 5: 2/3 - Deployment PART ONE
 
 
 
