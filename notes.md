@@ -251,6 +251,36 @@ guarantee- apps that require high level resources (mission critical apps, video 
 ## DAY 5: 2/3 - Deployment PART ONE
 
 
+apiVersion: apps/v1             #resource type
+kind: Deployment                #resource type
+metadata:                           #name +labels
+  name: nginx-deployment            #name +labels
+  labels:                           #name +labels
+    app: nginx                      #name +labels
+spec:                           
+  replicas: 3                   #replica sets  -  3 pods with app=nginx
+  selector:                     #replica sets
+    matchLabels:                #replica sets
+      app: nginx                #replica sets
+  template:                             
+    metadata:                                   #template - how the app will be created
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi  
+
+
 
 
 
