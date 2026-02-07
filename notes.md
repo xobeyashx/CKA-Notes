@@ -250,7 +250,7 @@ guarantee- apps that require high level resources (mission critical apps, video 
 
 ## DAY 5: 2/3 - Deployment PART ONE
 
-
+```
 apiVersion: apps/v1             #resource type
 kind: Deployment                #resource type
 metadata:                           #name +labels
@@ -279,7 +279,7 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi  
-
+```
 
 
 
