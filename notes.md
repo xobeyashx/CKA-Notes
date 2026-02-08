@@ -321,18 +321,59 @@ ClusterIP is internal-only, NodePort exposes a service on every node, and both r
 
 ReplicaSets = Manual Scaling and AutoScaling (hpa)
 
+**Troubleshooting:**
+
+Pod is in pending state -> edit deployment and lower memory limit and request.
 
 
+Manual Scaling: `kubectl scale deployment webapp --replicas 6`
 
+Auto Scaling or **HPA** (horizontal pod autoscaling)
 
+* Name of Deployment
+* When to Scale? CPU > 80%
+* How to Scale? scaling policy
 
+```
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: webapp-hpa
+spec:
+  behavior:
+  scaleDown:
+    stabilizationWindowSeconds: 20
+    policies:
+    - type: Pods
+      value: 1
+      periodSeconds: 15
+  scaleUp:
+    stabilizationWindowSeconds: 30
+    policies:
+    - type: Pods
+      value: 1
+      periodSeconds: 30
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: webapp
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 10
+```
 
+as load goes up, autoscaling will keep creating pods until it reaches the MAX defined pods `(maxReplicas: 10)`
 
+will only do **cpu** and **memory**
 
-
-
-
-
+**KEDA - Kubernetes Event Driven Autoscaling (higher level hpa)**
+* can integrate with Prometheus and other tools for higher level use
 
 
 
