@@ -289,6 +289,51 @@ so a replicaset will create and manage pods. if one pod is deleted, it will crea
 
 ## DAY 6: 2/4 - Deployment PART TWO
 
+**NodePort**
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc-np
+spec:
+  type: NodePort                #what makes it NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      # By default and for convenience, the `targetPort` is set to
+      # the same value as the `port` field.
+      targetPort: 80
+      # Optional field
+      # By default and for convenience, the Kubernetes control plane
+      # will allocate a port from a range (default: 30000-32767)
+      #     nodePort: 30007 (optional)
+```      
+
+`kubectl get svc` = you will now see NodePort
+
+ClusterIP is internal-only, NodePort exposes a service on every node, and both route traffic to Pods via kube-proxy.
+
+**NodePort** exposes the service on every node's IP - not recommended in production set-up
+
+`APP -> Deployment -> ReplicaSets -> Pods <- Service`
+
+ReplicaSets = Manual Scaling and AutoScaling (hpa)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## DAY 7: 2/5 - Deployment PART THREE
