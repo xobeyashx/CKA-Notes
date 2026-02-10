@@ -378,3 +378,88 @@ will only do **cpu** and **memory**
 
 
 ## DAY 7: 2/5 - Deployment PART THREE
+
+recreate - ramped - blue/green - canary - a/b testing 
+
+
+
+## DAY 8: 2/9 - Probes
+
+
+## DAY 9: 2/10 - namespaces
+
+namespace is the equivalent of projects in openshift
+
+A namespace in Kubernetes is a logical partition of a cluster used to organize, isolate, and manage resources.
+
+Think of it like folders inside one big filesystem (the cluster).
+
+`kubectl get namespaces` or `ns`
+
+`kubectl create ns dev`
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: development
+  labels:
+    name: development
+```
+
+`kubectl config current-context`
+
+`kubectl config get-contexts`
+
+`kubectl config set-context --current --namespace=dev` - set namespace
+
+```
+metadata:
+  name: development
+  namespace: dev
+```
+kubectl apply -f mypod.yaml -n dev
+
+**QUOTAS**
+
+A Kubernetes quota is a way to put hard limits on how much cluster resources a team, app, or namespace is allowed to use.
+
+Think of a quota like a budget for a namespace.
+
+```
+kubectl create quota my-quota
+--hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10
+```
+
+once you create a quota in a project, you cannot create a project without hard-coding (adding resource block) in the yaml file
+
+**LimitRange**
+
+sets limits on per pod basis - how much a single pod is allowed to consume in a cluster
+
+apply LimitRange to default namespace, it will be applied in the default resource block (for those without resource block) 
+
+```
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: prod-limit-range
+  namespace: prod
+spec:
+  limits:
+  - default:                           # this section defines default limits
+      cpu: 500m
+      memory: 128Mi
+    defaultRequest:                   # this section defines default requests
+      cpu: 500m
+      memory: 71Mi
+
+    max:                              # max and min define the limit range
+      cpu: "300m"
+      memory: 256Mi
+    min:
+      cpu: 100m
+      memory: 128Mi
+    type: Container
+```
+
