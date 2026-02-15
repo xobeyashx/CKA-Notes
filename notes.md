@@ -246,12 +246,12 @@ metadata:                           #name +labels
   name: nginx-deployment            #name +labels
   labels:                           #name +labels
     app: nginx                      #name +labels
-spec:                         
+spec:                       
   replicas: 3                   #replica sets  -  3 pods with app=nginx
   selector:                     #replica sets
     matchLabels:                #replica sets
       app: nginx                #replica sets
-  template:                           
+  template:                         
     metadata:                                   #template - how the app will be created
       labels:                                    #template - how the app will be created
         app: nginx                               #template - how the app will be created
@@ -262,12 +262,12 @@ spec:
         ports:
         - containerPort: 80
         resources:                               #template - how the app will be created
-          limits:                                             
+          limits:                                           
             cpu: 200m
             memory: 256Mi
           requests:
             cpu: 100m                                #template - how the app will be created
-            memory: 128Mi                                             
+            memory: 128Mi                                           
 ```
 
 `metadata label app` can be different
@@ -285,7 +285,6 @@ so a replicaset will create and manage pods. if one pod is deleted, it will crea
 **Label of Pod** must match - selector of replicaset and selector of service
 
 **containerPort** must match - **targetPort**
-
 
 ## DAY 6: 2/4 - Deployment PART TWO
 
@@ -309,7 +308,7 @@ spec:
       # By default and for convenience, the Kubernetes control plane
       # will allocate a port from a range (default: 30000-32767)
       #     nodePort: 30007 (optional)
-```      
+```
 
 `kubectl get svc` = you will now see NodePort
 
@@ -324,7 +323,6 @@ ReplicaSets = Manual Scaling and AutoScaling (hpa)
 **Troubleshooting:**
 
 Pod is in pending state -> edit deployment and lower memory limit and request.
-
 
 Manual Scaling: `kubectl scale deployment webapp --replicas 6`
 
@@ -373,20 +371,100 @@ as load goes up, autoscaling will keep creating pods until it reaches the MAX de
 will only do **cpu** and **memory**
 
 **KEDA - Kubernetes Event Driven Autoscaling (higher level hpa)**
+
 * can integrate with Prometheus and other tools for higher level use
-
-
 
 ## DAY 7: 2/5 - Deployment PART THREE
 
-recreate - ramped - blue/green - canary - a/b testing 
+recreate - ramped - blue/green - canary - a/b testing
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-deploy
+  annotations:
+    kubernetes.io/change-cause: "changing version to new"
+spec:
+  revisionHistoryLimit: 5
+  replicas: 10
+  selector:
+     matchLabels:
+        app: hello-world
+  minReadySeconds: 10
+  strategy:
+     type: RollingUpdate
+     rollingUpdate:
+        maxUnavailable: 1
+        maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-pod
+        image: lovelearnlinux/webserver:v1    #version
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /var/www/html/index.html
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 4
+          failureThreshold: 2
+          successThreshold: 1
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /var/www/html/index.html
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 4
+          failureThreshold: 6
+          successThreshold: 1
+
+# kubectl set image deploy/hello-deploy hello-pod=lovelearnlinux/webserver:v2 --annotation=update image from v1 to v2
+# kubectl annotate deployments.apps hello-deploy kubernetes.io/change-cause="image changed to nginx:latest"
+# kubectl rollout history deployment hello-deploy --revision 5
 
 
+```
+
+`revisionHistoryLimit: 5` - last 5 versions to keep in /etcd
+
+this is to update/upgrade
 
 ## DAY 8: 2/9 - Probes
 
+Find out if your application has become malfunctioned
 
-## DAY 9: 2/10 - namespaces
+* so lets say we're running a application in 3 pods, kubernetes will not know if its working (in the case of `index.html` deleted as an example in one pod)
+* it will work on 2 pods, but if it connects to the 3rd one (without `index.html`) it won't work
+* pod will still show running, doesn't mean it's working
+* this is where the `probes` come in (checks/probes the application)
+
+We have 3 probes:
+
+* start-up probes -
+  * checks if container is ready to serve
+  * ready only once
+  * `initialDelaySeconds: 5` - checks conditions after 5 seconds
+* readiness probe
+* liveness probe
+
+## DAY 9: 2/10 - Namespaces. Resource Quota. Limit Range
 
 namespace is the equivalent of projects in openshift
 
@@ -418,6 +496,7 @@ metadata:
   name: development
   namespace: dev
 ```
+
 kubectl apply -f mypod.yaml -n dev
 
 **QUOTAS**
@@ -437,7 +516,7 @@ once you create a quota in a project, you cannot create a project without hard-c
 
 sets limits on per pod basis - how much a single pod is allowed to consume in a cluster
 
-apply LimitRange to default namespace, it will be applied in the default resource block (for those without resource block) 
+apply LimitRange to default namespace, it will be applied in the default resource block (for those without resource block)
 
 ```
 apiVersion: v1
@@ -463,3 +542,6 @@ spec:
     type: Container
 ```
 
+## DAY 10: 2/11 - Network Policies
+
+## DAY 11: 2/12 - node selector. Affinity. Tains and Tolerations
