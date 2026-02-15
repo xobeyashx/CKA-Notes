@@ -246,12 +246,12 @@ metadata:                           #name +labels
   name: nginx-deployment            #name +labels
   labels:                           #name +labels
     app: nginx                      #name +labels
-spec:                       
+spec:                   
   replicas: 3                   #replica sets  -  3 pods with app=nginx
   selector:                     #replica sets
     matchLabels:                #replica sets
       app: nginx                #replica sets
-  template:                         
+  template:                     
     metadata:                                   #template - how the app will be created
       labels:                                    #template - how the app will be created
         app: nginx                               #template - how the app will be created
@@ -262,12 +262,12 @@ spec:
         ports:
         - containerPort: 80
         resources:                               #template - how the app will be created
-          limits:                                           
+          limits:                                       
             cpu: 200m
             memory: 256Mi
           requests:
             cpu: 100m                                #template - how the app will be created
-            memory: 128Mi                                           
+            memory: 128Mi                                       
 ```
 
 `metadata label app` can be different
@@ -450,19 +450,62 @@ this is to update/upgrade
 
 Find out if your application has become malfunctioned
 
+* When you define a startupProbe:
+* Kubernetes runs only the startupProbe first
+* If it fails → container is restarted
+* If it succeeds → Kubernetes enables:
+  * livenessProbe
+  * readinessProbe
+
+So it acts like a gatekeeper before other probes kick in.
+
 * so lets say we're running a application in 3 pods, kubernetes will not know if its working (in the case of `index.html` deleted as an example in one pod)
 * it will work on 2 pods, but if it connects to the 3rd one (without `index.html`) it won't work
 * pod will still show running, doesn't mean it's working
 * this is where the `probes` come in (checks/probes the application)
+
+`startupProbe` in Kubernetes is used to determine whether a container has successfully started before other health checks (like liveness and readiness probes) begin.
 
 We have 3 probes:
 
 * start-up probes -
   * checks if container is ready to serve
   * ready only once
-  * `initialDelaySeconds: 5` - checks conditions after 5 seconds
+  * thresholds/parameters:
+    * `initialDelaySeconds: 5` - checks conditions after 5 seconds
+    * `period: 5`
+    * `waitTime: 2`
+    * `failureThreshold: 3`
+    * `success: 1`
 * readiness probe
+  * monitors pod throughout the life of pod - after startup
+  * if fails, pod will be removed from service endpoint (quarantined)
+  * timer starts after success of startup probe (if defined)
+  * same parameters can be made as startup
+    * `failureThreshold: 3` - 3 subsequent failures, pod will be removed/quarantined
 * liveness probe
+  * runs throughout life of pod
+  * if failed, it will restart container - trying to recover from the failed state
+  * timer will start after success of startup probe (if defined)
+  * same parameters (or whatever you set)
+    * `failureThreshold: 3` - 3 subsequent failures, container will restart
+
+startupProbe: (under spec: -> - containerPort:)
+
+```
+startupProbe:
+  exec:
+    command:
+    - cat
+    - /usr/share/nginx/html/index.html
+  failureThreshold: 5
+  periodSeconds: 10
+  initialDelaySeconds: 10
+```
+
+you can add the same with `readinessProbe` and `livenessProbe` and configure them to custom parameters for them to work after the `startupProbe`
+
+[kubernetes docs on liveness-readiness-startup-probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 
 ## DAY 9: 2/10 - Namespaces. Resource Quota. Limit Range
 
