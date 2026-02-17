@@ -587,4 +587,66 @@ spec:
 
 ## DAY 10: 2/11 - Network Policies
 
+ Network Policies in Kubernetes control which pods can talk to which other pods (and external endpoints) — basically acting like a firewall inside your cluster. 
+
+ ```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prod-network-policy
+  namespace: prod
+spec:
+  podSelector: {}      #{} mean all pods
+   # matchLabels:
+   #   role: db
+  policyTypes:
+  - Ingress               #incoming
+  # - Egress              #outgoing
+  ingress:
+  - from:
+     # - ipBlock:                            # ip can change so shouldn't reply on ip for network policies
+      #    cidr: 172.17.0.0/16                # everything under -from is OR (ip or namespace or selector)
+       #   except:
+        #  - 172.17.1.0/24
+    - namespaceSelector:
+        matchLabels:
+          project: myproject                   # namespace label in pod (can be custom if changed)    
+      # podSelector:
+      #  matchLabels:
+      #     role: frontend
+    ports:
+    - protocol: TCP
+      port: 80
+
+ ```
+
+if you want to only connect to a specific pod in an enviornment, make sure to set pod label as well
+
+```
+       podSelector:
+       matchLabels:
+        app: frontend
+```
+
+check with 
+
+``` kubectl -n dev exec devtwo -- curl <ip> ```
+
+dev = namespace
+devtwo  = podname in the dev namespace
+
+multiple namespaces:
+
+```
+    - namespaceSelector:
+        matchExpressions:
+        - key: namespace
+          operator: In
+          values: ["frontend", "backend"]
+```
+
 ## DAY 11: 2/12 - node selector. Affinity. Tains and Tolerations
+
+
+## DAY 12: 2/16 - Secrets & Configmaps
+
