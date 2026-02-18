@@ -719,6 +719,6 @@ conditions on nodes (when a pod is trying to get deployed on a node, it needs to
 
 * `kubectl taint nodes node1 dedicated=prod:NoSchedule`
 
-so if there is already pods running on the nodes, and you add a `taint`, those pods without the taint label will move to other pods
+so if there is already pods running on the nodes, and you add a `taint`, those pods without the taint label will move to other pods (depends on the policy/ex: NoExecute)
 
 ## DAY 12: 2/16 - Secrets & Configmaps
