@@ -246,12 +246,12 @@ metadata:                           #name +labels
   name: nginx-deployment            #name +labels
   labels:                           #name +labels
     app: nginx                      #name +labels
-spec:                   
+spec:                 
   replicas: 3                   #replica sets  -  3 pods with app=nginx
   selector:                     #replica sets
     matchLabels:                #replica sets
       app: nginx                #replica sets
-  template:                     
+  template:                   
     metadata:                                   #template - how the app will be created
       labels:                                    #template - how the app will be created
         app: nginx                               #template - how the app will be created
@@ -262,12 +262,12 @@ spec:
         ports:
         - containerPort: 80
         resources:                               #template - how the app will be created
-          limits:                                       
+          limits:                                     
             cpu: 200m
             memory: 256Mi
           requests:
             cpu: 100m                                #template - how the app will be created
-            memory: 128Mi                                       
+            memory: 128Mi                                     
 ```
 
 `metadata label app` can be different
@@ -587,38 +587,38 @@ spec:
 
 ## DAY 10: 2/11 - Network Policies
 
- Network Policies in Kubernetes control which pods can talk to which other pods (and external endpoints) — basically acting like a firewall inside your cluster. 
+Network Policies in Kubernetes control which pods can talk to which other pods (and external endpoints) — basically acting like a firewall inside your cluster.
 
- ```
+```
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: prod-network-policy
-  namespace: prod
+ name: prod-network-policy
+ namespace: prod
 spec:
-  podSelector: {}      #{} mean all pods
-   # matchLabels:
-   #   role: db
-  policyTypes:
-  - Ingress               #incoming
-  # - Egress              #outgoing
-  ingress:
-  - from:
-     # - ipBlock:                            # ip can change so shouldn't reply on ip for network policies
-      #    cidr: 172.17.0.0/16                # everything under -from is OR (ip or namespace or selector)
-       #   except:
-        #  - 172.17.1.0/24
-    - namespaceSelector:
-        matchLabels:
-          project: myproject                   # namespace label in pod (can be custom if changed)    
-      # podSelector:
-      #  matchLabels:
-      #     role: frontend
-    ports:
-    - protocol: TCP
-      port: 80
+ podSelector: {}      #{} mean all pods
+  # matchLabels:
+  #   role: db
+ policyTypes:
+ - Ingress               #incoming
+ # - Egress              #outgoing
+ ingress:
+ - from:
+    # - ipBlock:                            # ip can change so shouldn't reply on ip for network policies
+     #    cidr: 172.17.0.0/16                # everything under -from is OR (ip or namespace or selector)
+      #   except:
+       #  - 172.17.1.0/24
+   - namespaceSelector:
+       matchLabels:
+         project: myproject                   # namespace label in pod (can be custom if changed)  
+     # podSelector:
+     #  matchLabels:
+     #     role: frontend
+   ports:
+   - protocol: TCP
+     port: 80
 
- ```
+```
 
 if you want to only connect to a specific pod in an enviornment, make sure to set pod label as well
 
@@ -628,9 +628,9 @@ if you want to only connect to a specific pod in an enviornment, make sure to se
         app: frontend
 ```
 
-check with 
+check with
 
-``` kubectl -n dev exec devtwo -- curl <ip> ```
+```kubectl -n dev exec devtwo -- curl <ip>```
 
 dev = namespace
 devtwo  = podname in the dev namespace
@@ -645,8 +645,80 @@ multiple namespaces:
           values: ["frontend", "backend"]
 ```
 
-## DAY 11: 2/12 - node selector. Affinity. Tains and Tolerations
+## DAY 11: 2/12 - node selector. Affinity. Taints and Tolerations
 
+`NodeSelector`, `Affinity`, and `Taints/Tolerations` are Kubernetes scheduling rules that control which nodes your Pods can (or cannot) run on.
+
+The Kubernetes scheduler watches for unscheduled Pods and assigns them to the best possible node based on constraints, resources, and scoring rules.
+
+so it will assign a pod to the node with the most available space (free space)
+
+**specifying a node to go to:**
+
+```
+spec:
+  nodeName: nodetwo
+```
+
+* complete app will go to nodetwo. usually it will distribute but this will onyl make it so it goes to one specific node
+* it skips scheduler part when specifying a node to go to
+
+#### NodeSelector
+
+* label node based on their feature
+* label nodes first (disk: ssd, cpu: i7/disk: sats, cpu: i5/disk: ssd, cpu: xeon/etc...)
+* checked during scheduling (when getting deployed) & ignored during execution
+* only single condition (affinity for multiple)
+
+```
+spec:
+  nodeSelector:
+    disktype: ssd
+    cpu: xeon
+```
+above application will only go to nodes with labels ssd and xeon
+
+`kubectl label node node1 disktype=ssd` can do same for cpu or any other lables
+
+`kubectl label node node1 disktype=sata --overwrite` to change a label 
+
+#### Affinity and anti-affinity
+
+* can use multiple conditions
+* same as NodeSelector with extra features
+
+If no matching node exists → Pod stays Pending:
+```
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: disktype
+            operator: In            # can put NotIn (not in ssd and sata)
+            values:                 # OR
+            - ssd
+            - sata           
+
+```
+
+there is also `podAffinity` and `podAntiAffinity` as well. same concept. Controls scheduling relative to other Pods.
+
+#### Taints and Tolerations
+
+* NodeSelector & Affinity = Pod chooses node
+* Taints = Node repels Pods
+
+* Taints - Node
+* Toleration - Pods
+
+conditions on nodes (when a pod is trying to get deployed on a node, it needs to sepcifically have a label that allows it to be deployed to the node)
+
+* key=value:policy
+
+* `kubectl taint nodes node1 dedicated=prod:NoSchedule`
+
+so if there is already pods running on the nodes, and you add a `taint`, those pods without the taint label will move to other pods
 
 ## DAY 12: 2/16 - Secrets & Configmaps
-
