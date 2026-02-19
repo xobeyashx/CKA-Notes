@@ -722,3 +722,32 @@ conditions on nodes (when a pod is trying to get deployed on a node, it needs to
 so if there is already pods running on the nodes, and you add a `taint`, those pods without the taint label will move to other pods (depends on the policy/ex: NoExecute)
 
 ## DAY 12: 2/16 - Secrets & Configmaps
+
+## DAY 13: 2/18 - 
+
+## DAY 14: 2/19 - Helm
+
+Helm is a package manager for Kubernetes that helps you define, install, and manage applications in a cluster using reusable templates called charts.
+
+`helm repo list`
+
+`helm repo update`
+
+`helm repo add bitnami https://charts.bitnami.com/bitnami`
+
+`helm install my-nginx bitnami/nginx`
+
+`helm search repo apache` - only in apache list. you get version here for oyur package
+
+`helm -n dev install myapache bitnami/apache --version 11.4.29` - specific version
+
+`helm -n dev list`
+
+`helm uninstall myapache -n dev` - to uninstall
+
+`helm show chart bitnami/apache --version 11.4.29` - shows info/values
+
+`helm show values bitnami/apache --version 11.4.29 >> dev-values.yaml` - edit these values according to what you want
+
+`helm -n dev install myapache bitname/apache --version 11.4.29 --values dev-values.yaml` - to deploy from customized yaml file
+
